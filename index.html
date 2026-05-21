@@ -81,7 +81,6 @@
         const mode = params.get('mode') || 'kiosk'; 
         const AVG_SERVICE_TIME = 5; 
 
-        // การตั้งค่าสีของป้ายหน้า Staff: ปรับข้อความให้เข้มเด่นชัดเจน อ่านง่าย ไม่กลืนกับพื้นหลัง
         const getCounterConfig = (counterNum) => {
             if (counterNum === 1) return { type: 'walkin', label: 'Walk-in (ตรวจทั่วไป)', color: 'bg-sky-500 text-white border-sky-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white shadow-xl font-black' };
             if (counterNum === 2) return { type: 'vaccine', label: 'นัดรับวัคซีน', color: 'bg-pink-500 text-white border-pink-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white shadow-xl font-black' };
@@ -138,7 +137,7 @@
         };
 
         // ==========================================
-        // 1. KIOSK MODE (ปรับเป็นปุ่มสีชมพู ตัวหนังสือขาว ทุกปุ่ม)
+        // 1. KIOSK MODE 
         // ==========================================
         const renderKiosk = (container) => {
             let resetTimer = null;
@@ -259,7 +258,7 @@
         };
 
         // ==========================================
-        // 3. STAFF MODE (แก้ปัญหาเรื่องสีฟอนต์จาง/กลืนกับพื้นหลัง ทำให้อ่านง่ายขึ้น 100%)
+        // 3. STAFF MODE 
         // ==========================================
         const renderStaff = (container) => {
             let currentCounter = 1;
@@ -326,7 +325,6 @@
                     if (btnNum === currentCounter) {
                         btn.className = `counter-tab-btn p-4 rounded-2xl border-4 text-center transition flex flex-col items-center justify-center gap-1 ${conf.activeBtn}`;
                     } else {
-                        // ปรับปุ่มที่ไม่ได้เลือกให้ออกโทนเข้มชัดเจนขึ้น ไม่จางหายไปกับพื้นหลัง
                         btn.className = `counter-tab-btn p-4 rounded-2xl border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 text-center transition flex flex-col items-center justify-center gap-1 font-bold`;
                     }
                 });
@@ -359,7 +357,6 @@
                 const waiting = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp);
                 document.getElementById('staff-wait-count').innerText = waiting.length;
                 
-                // แก้จุดสีฟอนต์จางในลิสต์รอ: ปรับตัวเลขคิวเป็นสีชมพู/เทาเข้มตัวใหญ่ชัดเจนที่สุด
                 document.getElementById('staff-wait-list').innerHTML = waiting.map(q => 
                     `<li class="flex justify-between items-center p-3.5 bg-white border-2 border-slate-200 rounded-xl animate-fade-in shadow-sm">
                         <span class="text-3xl font-black text-pink-600"><i class="fa-solid fa-ticket text-amber-500 mr-2 text-xl"></i> ${q.number}</span>
@@ -390,7 +387,7 @@
         };
 
         // ==========================================
-        // 4. TV DISPLAY MODE 
+        // 4. TV DISPLAY MODE (ปรับป้ายห้องบริการเป็น สีชมพู พื้นหลังขาว ตามบรีฟล่าสุด)
         // ==========================================
         const renderTV = (container) => {
             let lastAnnounce = "";
@@ -464,18 +461,19 @@
                     }
                 }
                 
+                // แก้ไขส่วนป้ายห้องบริการบน TV: เปลี่ยนคลาสตกแต่งจากเดิม (สีฟ้า) เป็น bg-pink-500 text-white (พื้นหลังสีชมพู ตัวหนังสือสีขาว) เรียบร้อยครับ
                 document.getElementById('tv-serving-list').innerHTML = serving.map((q, idx) => {
                     const isNew = idx === 0; 
                     return `
-                    <div class="${isNew ? 'bg-amber-50 border-4 border-sky-400 animate-pulse-sky shadow-lg' : 'bg-gray-50 border border-gray-100 text-gray-400'} 
+                    <div class="${isNew ? 'bg-amber-50 border-4 border-pink-400 animate-pulse-sky shadow-lg' : 'bg-gray-50 border border-gray-100 text-gray-400'} 
                         p-5 rounded-3xl flex justify-between items-center transition-all">
                         <div>
-                            <span class="${isNew ? 'text-lg text-sky-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">หมายเลขคิว</span>
+                            <span class="${isNew ? 'text-lg text-pink-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">หมายเลขคิว</span>
                             <span class="${isNew ? 'text-8xl text-gray-800' : 'text-5xl text-gray-500'} font-black tracking-tight">${q.number}</span>
                         </div>
                         <div class="text-right">
-                            <span class="${isNew ? 'text-lg text-sky-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">ห้องบริการที่</span>
-                            <span class="${isNew ? 'text-7xl bg-sky-400 text-white border-b-8 border-sky-600 px-6 py-1 rounded-2xl' : 'text-4xl bg-gray-300 text-gray-500 px-4 py-1 rounded-xl'} font-black">${q.counter}</span>
+                            <span class="${isNew ? 'text-lg text-pink-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">ห้องบริการที่</span>
+                            <span class="${isNew ? 'text-7xl bg-pink-500 text-white border-b-8 border-pink-700 px-6 py-1 rounded-2xl' : 'text-4xl bg-gray-300 text-gray-500 px-4 py-1 rounded-xl'} font-black">${q.counter}</span>
                         </div>
                     </div>`;
                 }).join('');
