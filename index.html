@@ -24,8 +24,8 @@
         }
         
         @keyframes pulse-sky {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.8); }
-            50% { box-shadow: 0 0 0 30px rgba(14, 165, 233, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
+            50% { box-shadow: 0 0 0 20px rgba(244, 63, 94, 0); }
         }
         .animate-pulse-sky { animation: pulse-sky 2s infinite; }
         
@@ -387,7 +387,7 @@
         };
 
         // ==========================================
-        // 4. TV DISPLAY MODE (ปรับป้ายห้องบริการเป็น สีชมพู พื้นหลังขาว ตามบรีฟล่าสุด)
+        // 4. TV DISPLAY MODE (ปรับแก้โครงสร้าง Flexbox เพื่อป้องกันข้อความทับกัน 100%)
         // ==========================================
         const renderTV = (container) => {
             let lastAnnounce = "";
@@ -461,19 +461,23 @@
                     }
                 }
                 
-                // แก้ไขส่วนป้ายห้องบริการบน TV: เปลี่ยนคลาสตกแต่งจากเดิม (สีฟ้า) เป็น bg-pink-500 text-white (พื้นหลังสีชมพู ตัวหนังสือสีขาว) เรียบร้อยครับ
+                // [จุดแก้ไข] เปลี่ยนแปลงสไตล์แถวขวามือ: ปรับเป็น flex-col (แนวตั้ง) หรือแยกส่วนออกจากกันให้ชัดเจน
+                // และทำการใส่ gap-4 ปล่อยให้มันขยายตัวตามความกว้างของหน้าจอได้อย่างอิสระ ไม่บีบอัดกันในพื้นที่เล็กๆ แล้วครับ
                 document.getElementById('tv-serving-list').innerHTML = serving.map((q, idx) => {
                     const isNew = idx === 0; 
                     return `
                     <div class="${isNew ? 'bg-amber-50 border-4 border-pink-400 animate-pulse-sky shadow-lg' : 'bg-gray-50 border border-gray-100 text-gray-400'} 
-                        p-5 rounded-3xl flex justify-between items-center transition-all">
-                        <div>
+                        p-5 rounded-3xl flex flex-row justify-between items-center gap-4 transition-all">
+                        <div class="flex-1">
                             <span class="${isNew ? 'text-lg text-pink-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">หมายเลขคิว</span>
-                            <span class="${isNew ? 'text-8xl text-gray-800' : 'text-5xl text-gray-500'} font-black tracking-tight">${q.number}</span>
+                            <span class="${isNew ? 'text-8xl text-gray-800' : 'text-5xl text-gray-500'} font-black tracking-tight leading-none">${q.number}</span>
                         </div>
-                        <div class="text-right">
-                            <span class="${isNew ? 'text-lg text-pink-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-1">ห้องบริการที่</span>
-                            <span class="${isNew ? 'text-7xl bg-pink-500 text-white border-b-8 border-pink-700 px-6 py-1 rounded-2xl' : 'text-4xl bg-gray-300 text-gray-500 px-4 py-1 rounded-xl'} font-black">${q.counter}</span>
+                        <div class="flex flex-col items-end justify-center min-w-[210px]">
+                            <span class="${isNew ? 'text-base text-pink-500 font-bold' : 'text-sm text-gray-400 font-semibold'} block mb-2 text-right">ช่องทางตรวจ</span>
+                            <div class="flex items-center justify-center ${isNew ? 'bg-pink-500 text-white border-b-8 border-pink-700 px-5 py-2 rounded-2xl' : 'bg-gray-300 text-gray-500 px-4 py-2 rounded-xl'} font-black">
+                                <span class="${isNew ? 'text-2xl' : 'text-lg'} mr-2 opacity-90">ห้องที่</span>
+                                <span class="${isNew ? 'text-6xl' : 'text-4xl'} leading-none">${q.counter}</span>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
