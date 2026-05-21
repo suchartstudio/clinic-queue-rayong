@@ -88,6 +88,14 @@
             return { type: 'walkin', label: 'Walk-in', color: 'bg-sky-500 text-white border-sky-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white' };
         };
 
+        // ฟังก์ชันช่วยแสดงป้ายกำกับคิวในหน้าบอร์ดเจ้าหน้าที่
+        const getTypeBadgeHTML = (type) => {
+            if (type === 'walkin') return `<span class="text-xs font-bold px-2 py-1 rounded-md bg-sky-100 text-sky-700 border border-sky-200">ตรวจทั่วไป</span>`;
+            if (type === 'vaccine') return `<span class="text-xs font-bold px-2 py-1 rounded-md bg-pink-100 text-pink-700 border border-pink-200">รับวัคซีน</span>`;
+            if (type === 'course') return `<span class="text-xs font-bold px-2 py-1 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">ฝึกคอร์ส</span>`;
+            return `<span class="text-xs font-bold px-2 py-1 rounded-md bg-gray-100 text-gray-700">ทั่วไป</span>`;
+        };
+
         const playBeep = (type = 'normal') => {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -132,7 +140,7 @@
             const appDiv = document.getElementById('app');
             if (mode === 'kiosk') renderKiosk(appDiv);
             else if (mode === 'user') renderUser(appDiv);
-            else if (mode === 'staff') renderStaff(appDiv);
+            else if (mode === 'staff') renderStaffGatekeeper(appDiv);
             else if (mode === 'tv') renderTV(appDiv);
         };
 
@@ -258,14 +266,53 @@
         };
 
         // ==========================================
-        // 3. STAFF MODE (เพิ่มกลไกปุ่ม Recall เรียกซ้ำ)
+        // 3. STAFF GATEKEEPER & MODE 
         // ==========================================
+        const renderStaffGatekeeper = (container) => {
+            container.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center bg-slate-100 p-6">
+                    <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-t-8 border-pink-500 text-center animate-fade-in">
+                        <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-lock text-3xl text-pink-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-slate-800 mb-2">พื้นที่สำหรับเจ้าหน้าที่</h2>
+                        <p class="text-slate-400 font-bold mb-6 text-sm">กรุณากรอกรหัสผ่านเพื่อเข้าใช้งานระบบเรียกคิว</p>
+                        
+                        <div class="mb-4">
+                            <input type="password" id="staff-password-input" placeholder="กรอกรหัสผ่าน 9 หลัก" 
+                                class="w-full text-center px-4 py-3.5 border-2 border-slate-200 rounded-xl font-bold text-2xl tracking-widest focus:outline-none focus:border-pink-400 transition">
+                            <p id="password-error" class="text-red-500 font-bold text-sm mt-2 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่ค่ะ</p>
+                        </div>
+                        
+                        <button id="btn-submit-password" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-black text-lg py-3.5 rounded-xl transition shadow-md border-b-4 border-pink-700">
+                            ยืนยันรหัสผ่าน <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const checkPassword = () => {
+                const passwordInput = document.getElementById('staff-password-input').value;
+                if (passwordInput === "987654321") {
+                    renderStaff(container);
+                } else {
+                    const errorMsg = document.getElementById('password-error');
+                    errorMsg.classList.remove('hidden');
+                    document.getElementById('staff-password-input').value = "";
+                    document.getElementById('staff-password-input').focus();
+                }
+            };
+
+            document.getElementById('btn-submit-password').onclick = checkPassword;
+            document.getElementById('staff-password-input').onkeydown = (e) => { if (e.key === 'Enter') checkPassword(); };
+        };
+
         const renderStaff = (container) => {
             let currentCounter = 1;
             let currentQID = null;
 
             container.innerHTML = `
-                <div class="min-h-screen bg-slate-100 p-4 md:p-8 text-slate-800">
+                <div class="min-h-screen bg-slate-100 p-4 md:p-8 text-slate-800 animate-fade-in">
                     <div class="max-w-5xl mx-auto">
                         <div class="bg-white p-6 rounded-3xl shadow-lg mb-6 border-4 border-pink-100">
                             <p class="text-xl font-bold text-slate-700 mb-4"><i class="fa-solid fa-hospital-user mr-2 text-pink-500"></i> เลือกห้องตรวจประจำเครื่องของคุณ:</p>
@@ -284,7 +331,7 @@
                                 </button>
                             </div>
                             <div class="mt-5 pt-4 border-t border-slate-200 flex justify-between items-center">
-                                <span class="text-base font-bold text-slate-500"><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i> ระบบเจ้าหน้าที่พร้อมทำงาน</span>
+                                <span class="text-base font-bold text-slate-500"><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i> เจ้าหน้าที่เข้าสู่ระบบด้วยสิทธิ์ที่ถูกต้อง</span>
                                 <div id="counter-type-badge" class="text-lg font-black px-5 py-1.5 rounded-full border shadow-sm"></div>
                             </div>
                         </div>
@@ -308,7 +355,7 @@
                             <div class="bg-white p-8 rounded-3xl shadow-xl border-t-8 border-emerald-400 flex flex-col">
                                 <div class="flex justify-between items-center mb-6">
                                     <div>
-                                        <h2 class="text-slate-500 text-lg font-bold">จำนวนคิวที่ยังรอตรวจ</h2>
+                                        <h2 class="text-slate-500 text-lg font-bold">คิวรอเรียกตรวจทั้งหมดในคลินิก</h2>
                                         <div class="text-5xl font-black text-emerald-600 mt-1" id="staff-wait-count">0</div>
                                     </div>
                                     <button id="btn-call" class="bg-amber-400 hover:bg-amber-500 text-slate-800 text-2xl font-black py-5 px-8 rounded-2xl shadow-md active:scale-95 transition border-b-4 border-amber-600">
@@ -351,25 +398,30 @@
                     currentQID = myServing.id;
                     document.getElementById('staff-current-q').innerText = myServing.number;
                     document.getElementById('btn-finish').disabled = false;
-                    document.getElementById('btn-recall').disabled = false; // เปิดปุ่มเรียกซ้ำ
+                    document.getElementById('btn-recall').disabled = false;
                     document.getElementById('btn-call').disabled = true;
                     document.getElementById('btn-call').classList.add('opacity-30');
                 } else {
                     currentQID = null;
                     document.getElementById('staff-current-q').innerText = "-";
                     document.getElementById('btn-finish').disabled = true;
-                    document.getElementById('btn-recall').disabled = true; // ปิดปุ่มเรียกซ้ำ
+                    document.getElementById('btn-recall').disabled = true;
                     document.getElementById('btn-call').disabled = false;
                     document.getElementById('btn-call').classList.remove('opacity-30');
                 }
 
-                const waiting = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp);
-                document.getElementById('staff-wait-count').innerText = waiting.length;
+                // [จุดแก้สำคัญ] ดึงคิว waiting "ทั้งหมด" ทุกประเภทขึ้นมาโชว์ที่ตาราง และเรียงตามเวลาที่กดรับคิว (เก่าไปใหม่)
+                const allWaiting = queues.filter(q => q.status === 'waiting').sort((a,b) => a.timestamp - b.timestamp);
+                document.getElementById('staff-wait-count').innerText = allWaiting.length;
                 
-                document.getElementById('staff-wait-list').innerHTML = waiting.map(q => 
-                    `<li class="flex justify-between items-center p-3.5 bg-white border-2 border-slate-200 rounded-xl animate-fade-in shadow-sm">
-                        <span class="text-3xl font-black text-pink-600"><i class="fa-solid fa-ticket text-amber-500 mr-2 text-xl"></i> ${q.number}</span>
-                        <span class="text-slate-700 text-lg font-black">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
+                // เรนเดอร์คิวทั้งหมดพร้อมติดป้าย Badge บอกว่าคิวนี้เป็นของแผนกไหน
+                document.getElementById('staff-wait-list').innerHTML = allWaiting.map(q => 
+                    `<li class="flex justify-between items-center p-3 bg-white border-2 border-slate-200 rounded-xl animate-fade-in shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-black text-pink-600"><i class="fa-solid fa-ticket text-amber-500 mr-1 text-xl"></i> ${q.number}</span>
+                            ${getTypeBadgeHTML(q.type)}
+                        </div>
+                        <span class="text-slate-500 text-base font-semibold">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
                      </li>`
                 ).join('');
             };
@@ -385,12 +437,12 @@
                 const config = getCounterConfig(currentCounter);
                 const snap = await get(ref(db, 'queues'));
                 const queues = Object.entries(snap.val() || {}).map(([k,v]) => ({id:k, ...v}));
+                // ปุ่ม Call Next ยังคงทำหน้าที่คัดกรองคิวเพื่อดึงคิวประเภทเดียวกับของห้องตัวเองขึ้นมาตรวจ
                 const nextQ = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp)[0];
                 if (nextQ) update(ref(db, `queues/${nextQ.id}`), { status: 'serving', counter: currentCounter, callTime: Date.now() });
                 else alert(`ไม่มีคิวประเภท ${config.label} เหลือในระบบแล้วค่ะคุณพยาบาล`);
             };
 
-            // กลไกปุ่ม Recall: อัปเดตเวลา callTime ใหม่ เพื่อให้จอทีวีสะดุ้งรับสัญญาณและประกาศเรียกซ้ำทันที
             document.getElementById('btn-recall').onclick = () => {
                 if (currentQID) {
                     update(ref(db, `queues/${currentQID}`), { callTime: Date.now() });
