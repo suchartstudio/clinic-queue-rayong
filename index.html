@@ -9,21 +9,26 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <link class="pwa-meta" rel="manifest" href="manifest.json">
-    <meta class="pwa-meta" name="theme-color" content="#2563eb">
+    <meta class="pwa-meta" name="theme-color" content="#000000">
     <meta class="pwa-meta" name="mobile-web-app-capable" content="yes">
     <meta class="pwa-meta" name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        body { font-family: 'Sarabun', sans-serif; }
-        @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #000000;
         }
-        .animate-pulse-green { animation: pulse-green 2s infinite; }
+        /* แอนิเมชันชีพจรสีฟ้าสำหรับคิวที่กำลังเรียกล่าสุด */
+        @keyframes pulse-cyan {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.8); }
+            50% { box-shadow: 0 0 0 30px rgba(6, 182, 212, 0); }
+        }
+        .animate-pulse-cyan { animation: pulse-cyan 2s infinite; }
+        
         @keyframes fade-in {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -36,7 +41,6 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => {
-                        // บังคับอัปเดต Service Worker ทันทีถ้ามีการเปลี่ยนแปลง
                         reg.update();
                         console.log('PWA Service Worker Registered!');
                     })
@@ -45,7 +49,7 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-black text-white selection:bg-blue-600">
 
     <div id="app"></div>
 
@@ -77,11 +81,12 @@
         const mode = params.get('mode') || 'kiosk'; 
         const AVG_SERVICE_TIME = 5; 
 
+        // ตัวตั้งค่าสีของป้าย: โทนน้ำเงิน-ฟ้า (Cyan & Blue) บนพื้นหลังมืด
         const getCounterConfig = (counterNum) => {
-            if (counterNum === 1) return { type: 'walkin', label: 'Walk-in', color: 'bg-blue-100 text-blue-700', activeBtn: 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' };
-            if (counterNum === 2) return { type: 'vaccine', label: 'นัดรับวัคซีน', color: 'bg-teal-100 text-teal-700', activeBtn: 'border-teal-600 bg-teal-50 text-teal-700 shadow-sm' };
-            if (counterNum === 3) return { type: 'course', label: 'นัดฝึกคอร์ส', color: 'bg-indigo-100 text-indigo-700', activeBtn: 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm' };
-            return { type: 'walkin', label: 'Walk-in', color: 'bg-blue-100 text-blue-700', activeBtn: 'border-blue-600 bg-blue-50 text-blue-700' };
+            if (counterNum === 1) return { type: 'walkin', label: 'Walk-in', color: 'bg-blue-900 text-blue-200 border-blue-500', activeBtn: 'border-cyan-400 bg-blue-900 text-cyan-300 shadow-lg' };
+            if (counterNum === 2) return { type: 'vaccine', label: 'นัดรับวัคซีน', color: 'bg-cyan-900 text-cyan-200 border-cyan-500', activeBtn: 'border-cyan-400 bg-cyan-900 text-cyan-300 shadow-lg' };
+            if (counterNum === 3) return { type: 'course', label: 'นัดฝึกคอร์ส', color: 'bg-indigo-900 text-indigo-200 border-indigo-500', activeBtn: 'border-cyan-400 bg-indigo-900 text-cyan-300 shadow-lg' };
+            return { type: 'walkin', label: 'Walk-in', color: 'bg-blue-900 text-blue-200 border-blue-500', activeBtn: 'border-cyan-400 bg-blue-900 text-cyan-300' };
         };
 
         const playBeep = (type = 'normal') => {
@@ -133,7 +138,7 @@
         };
 
         // ==========================================
-        // 1. KIOSK MODE
+        // 1. KIOSK MODE (หน้าตู้กดคิว - ตัวหนังสือใหญ่ สีน้ำเงินฟ้า)
         // ==========================================
         const renderKiosk = (container) => {
             let resetTimer = null;
@@ -149,35 +154,34 @@
                 if(currentUnsubscribe) currentUnsubscribe(); 
             };
             container.innerHTML = `
-                <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 text-white p-4">
-                    <div class="bg-white text-gray-800 p-8 rounded-3xl shadow-2xl text-center max-w-md w-full min-h-[480px] flex flex-col justify-center relative">
-                        <div id="welcome-text">
-                            <h1 class="text-3xl font-bold mb-2">ยินดีต้อนรับ</h1>
-                            <p class="text-gray-500 mb-6">กรุณาเลือกประเภทบริการเพื่อรับบัตรคิว</p>
+                <div class="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6">
+                    <div class="bg-gray-900 border-4 border-blue-600 p-10 rounded-3xl shadow-2xl text-center max-w-2xl w-full min-h-[600px] flex flex-col justify-center relative">
+                        <div id="welcome-text" class="mb-6">
+                            <h1 class="text-5xl font-black mb-4 tracking-wide text-cyan-400">ยินดีต้อนรับ</h1>
+                            <p class="text-2xl text-gray-400">กรุณากดปุ่มเพื่อรับบัตรคิว</p>
                         </div>
-                        <div id="kiosk-buttons" class="flex flex-col gap-4 w-full">
-                            <button id="btn-q-walkin" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-between px-6">
-                                <span class="flex items-center gap-3"><i class="fa-solid fa-person-walking text-2xl"></i> Walk-in</span>
-                                <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-normal">ช่อง 1</span>
+                        <div id="kiosk-buttons" class="flex flex-col gap-6 w-full">
+                            <button id="btn-q-walkin" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-xl transform transition active:scale-95 flex items-center justify-between px-10 border-2 border-blue-400">
+                                <span class="flex items-center gap-4"><i class="fa-solid fa-person-walking text-5xl text-cyan-300"></i> Walk-in</span>
+                                <span class="bg-black/40 text-xl px-4 py-2 rounded-lg font-normal text-cyan-300">ช่อง 1</span>
                             </button>
-                            <button id="btn-q-vaccine" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-xl font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-between px-6">
-                                <span class="flex items-center gap-3"><i class="fa-solid fa-syringe text-2xl"></i> นัดรับวัคซีน</span>
-                                <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-normal">ช่อง 2</span>
+                            <button id="btn-q-vaccine" class="w-full bg-cyan-700 hover:bg-cyan-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-xl transform transition active:scale-95 flex items-center justify-between px-10 border-2 border-cyan-400">
+                                <span class="flex items-center gap-4"><i class="fa-solid fa-syringe text-5xl text-blue-200"></i> รับวัคซีน</span>
+                                <span class="bg-black/40 text-xl px-4 py-2 rounded-lg font-normal text-blue-200">ช่อง 2</span>
                             </button>
-                            <button id="btn-q-course" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-between px-6">
-                                <span class="flex items-center gap-3"><i class="fa-solid fa-graduation-cap text-2xl"></i> นัดฝึกคอร์ส</span>
-                                <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-normal">ช่อง 3</span>
+                            <button id="btn-q-course" class="w-full bg-indigo-700 hover:bg-indigo-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-xl transform transition active:scale-95 flex items-center justify-between px-10 border-2 border-indigo-400">
+                                <span class="flex items-center gap-4"><i class="fa-solid fa-graduation-cap text-5xl text-cyan-300"></i> ฝึกคอร์ส</span>
+                                <span class="bg-black/40 text-xl px-4 py-2 rounded-lg font-normal text-cyan-300">ช่อง 3</span>
                             </button>
                         </div>
                         <div id="kiosk-result" class="hidden w-full animate-fade-in flex flex-col items-center">
-                            <p class="text-gray-500 text-sm">หมายเลขคิวของคุณ</p>
-                            <div id="q-number" class="text-7xl font-black text-blue-600 my-2 tracking-tighter"></div>
-                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-inner mb-4">
+                            <p class="text-gray-400 text-2xl font-bold">หมายเลขคิวของคุณ</p>
+                            <div id="q-number" class="text-9xl font-black text-cyan-400 my-6 tracking-tight"></div>
+                            <div class="bg-white p-6 rounded-2xl shadow-inner mb-6">
                                 <div id="qr-code"></div>
                             </div>
-                            <p class="text-lg font-bold text-red-500 animate-pulse"><i class="fa-solid fa-mobile-screen-button"></i> กรุณาสแกนเพื่อติดตามคิว</p>
-                            <p class="text-xs text-gray-400 mt-2">(ปิดอัตโนมัติใน 30 วินาที)</p>
-                            <button id="btn-cancel" class="mt-6 text-gray-400 underline text-sm hover:text-gray-600">ปิดหน้าต่าง</button>
+                            <p class="text-3xl font-black text-blue-400 animate-pulse"><i class="fa-solid fa-mobile-screen-button"></i> สแกนเพื่อดูคิวบนมือถือ</p>
+                            <button id="btn-cancel" class="mt-10 text-gray-500 underline text-xl hover:text-gray-300">ปิดหน้าต่างนี้</button>
                         </div>
                     </div>
                 </div>
@@ -191,7 +195,7 @@
                 document.getElementById('q-number').innerText = qNum;
                 document.getElementById('kiosk-result').classList.remove('hidden');
                 const trackingUrl = `${window.location.origin}${window.location.pathname}?mode=user&id=${qRef.key}`;
-                document.getElementById('qr-code').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}" alt="QR" class="mx-auto" />`;
+                document.getElementById('qr-code').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(trackingUrl)}" alt="QR" class="mx-auto" />`;
                 resetTimer = setTimeout(() => resetKioskUI(), 30000);
                 currentUnsubscribe = onValue(qRef, (snapshot) => {
                     const data = snapshot.val();
@@ -205,35 +209,35 @@
         };
 
         // ==========================================
-        // 2. USER MODE
+        // 2. USER MODE (หน้าจอมือถือคนไข้ - ตัวหนังสือใหญ่ อ่านง่ายมาก)
         // ==========================================
         const renderUser = (container) => {
             const ticketId = params.get('id');
             let soundEnabled = false, notifiedNear = false, notifiedServe = false;
-            if (!ticketId) { container.innerHTML = `<div class="p-10 text-center">ไม่พบข้อมูลคิว</div>`; return; }
+            if (!ticketId) { container.innerHTML = `<div class="p-10 text-center text-2xl text-red-400">ไม่พบข้อมูลคิว</div>`; return; }
             update(ref(db, 'queues/' + ticketId), { scanned: true });
             container.innerHTML = `
-                <div class="min-h-screen bg-gray-50 flex flex-col items-center p-6 transition-colors duration-500" id="user-bg">
-                    <button id="btn-enable-sound" class="mb-4 bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm animate-bounce"><i class="fa-solid fa-volume-xmark"></i> แตะเพื่อเปิดเสียงแจ้งเตือน</button>
-                    <div id="capture-area" class="bg-white w-full max-w-sm rounded-3xl shadow-xl p-8 text-center relative overflow-hidden border border-gray-100">
-                        <div class="border-b border-gray-100 pb-4 mb-4">
-                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Digital Ticket</div>
-                            <div class="text-xs text-gray-400" id="timestamp-display"></div>
+                <div class="min-h-screen bg-black flex flex-col items-center p-6 transition-colors duration-500" id="user-bg">
+                    <button id="btn-enable-sound" class="mb-6 bg-gray-900 border-2 border-blue-500 text-cyan-400 px-6 py-3 rounded-full text-lg font-bold flex items-center gap-3 shadow-lg animate-bounce"><i class="fa-solid fa-volume-xmark"></i> เปิดเสียงแจ้งเตือนคิว</button>
+                    <div id="capture-area" class="bg-gray-900 w-full max-w-md rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden border border-blue-900">
+                        <div class="border-b border-gray-800 pb-4 mb-4">
+                            <div class="text-lg font-bold text-blue-400 uppercase tracking-widest">คลินิกคิวระยอง</div>
+                            <div class="text-sm text-gray-500" id="timestamp-display"></div>
                         </div>
-                        <div id="status-badge" class="absolute top-0 left-0 w-full h-2 bg-gray-300"></div>
-                        <p class="text-gray-500 mt-2">คิวของคุณ</p>
-                        <h1 id="my-q" class="text-6xl font-black text-gray-800 my-2 tracking-tighter">-</h1>
-                        <div class="bg-blue-50 rounded-xl p-4 my-4 border border-blue-100">
-                            <p class="text-lg font-bold text-gray-700" id="status-text">กำลังโหลด...</p>
-                            <div id="eta-box" class="mt-2 text-sm text-gray-500">รออีก <span id="q-ahead" class="font-bold">0</span> คิว (~<span id="eta-time">-</span> นาที)</div>
+                        <div id="status-badge" class="absolute top-0 left-0 w-full h-3 bg-gray-700"></div>
+                        <p class="text-gray-400 text-xl mt-4">หมายเลขคิวของคุณ</p>
+                        <h1 id="my-q" class="text-8xl font-black text-white my-4 tracking-tight">-</h1>
+                        <div class="bg-blue-950/50 border-2 border-blue-800 rounded-2xl p-6 my-6">
+                            <p class="text-3xl font-black text-cyan-300" id="status-text">กำลังรอเรียก...</p>
+                            <div id="eta-box" class="mt-4 text-xl text-gray-400">รออีก <span id="q-ahead" class="font-bold text-white text-2xl">0</span> คิว (~<span id="eta-time" class="text-white text-2xl">-</span> นาที)</div>
                         </div>
                     </div>
-                    <button id="btn-save-ticket" class="mt-6 bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-8 rounded-full shadow-lg font-bold flex items-center gap-2 transform active:scale-95 transition"><i class="fa-solid fa-download"></i> บันทึกรูปบัตรคิว</button>
+                    <button id="btn-save-ticket" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white text-xl py-4 px-10 rounded-full shadow-lg font-bold flex items-center gap-2 transform active:scale-95 transition"><i class="fa-solid fa-download"></i> เซฟรูปบัตรคิวลงมือถือ</button>
                 </div>
             `;
             const btnSound = document.getElementById('btn-enable-sound');
-            btnSound.onclick = () => { soundEnabled = true; playBeep('normal'); btnSound.className = "mb-4 bg-green-100 text-green-600 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm"; btnSound.innerHTML = `<i class="fa-solid fa-volume-high"></i> เปิดเสียงแล้ว`; };
-            document.getElementById('btn-save-ticket').onclick = () => { html2canvas(document.getElementById('capture-area'), { scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Queue-Ticket.png`; link.href = canvas.toDataURL("image/png"); link.click(); }); };
+            btnSound.onclick = () => { soundEnabled = true; playBeep('normal'); btnSound.className = "mb-6 bg-blue-950 border-2 border-cyan-400 text-cyan-300 px-6 py-3 rounded-full text-lg font-bold flex items-center gap-3 shadow-lg"; btnSound.innerHTML = `<i class="fa-solid fa-volume-high"></i> เปิดเสียงแล้ว`; };
+            document.getElementById('btn-save-ticket').onclick = () => { html2canvas(document.getElementById('capture-area'), { backgroundColor: '#111827', scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Queue-Ticket.png`; link.href = canvas.toDataURL("image/png"); link.click(); }); };
             onValue(ref(db, 'queues'), (snapshot) => {
                 const allData = snapshot.val() || {}; const myData = allData[ticketId];
                 if (!myData) { document.getElementById('status-text').innerText = "คิวนี้ถูกยกเลิก"; return; }
@@ -241,11 +245,11 @@
                 const date = new Date(myData.timestamp); document.getElementById('timestamp-display').innerText = date.toLocaleDateString('th-TH') + ' ' + date.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
                 const bg = document.getElementById('user-bg'), badge = document.getElementById('status-badge'), statusTxt = document.getElementById('status-text');
                 if (myData.status === 'serving') {
-                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-green-500"; badge.className = "absolute top-0 left-0 w-full h-4 bg-green-600 animate-pulse";
-                    statusTxt.innerHTML = `เชิญช่อง <span class="text-3xl block mt-2 text-green-600">${myData.counter}</span>`; document.getElementById('eta-box').style.display = 'none';
+                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-blue-950"; badge.className = "absolute top-0 left-0 w-full h-4 bg-cyan-400 animate-pulse";
+                    statusTxt.innerHTML = `เชิญไปที่ <span class="text-4xl block mt-2 text-white font-black bg-cyan-600 px-4 py-2 rounded-xl">ช่องบริการที่ ${myData.counter}</span>`; document.getElementById('eta-box').style.display = 'none';
                     if (soundEnabled && !notifiedServe) { playBeep('alarm'); vibrateDevice([500, 200, 500]); notifiedServe = true; }
                 } else if (myData.status === 'waiting') {
-                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-gray-50"; badge.className = "absolute top-0 left-0 w-full h-2 bg-yellow-400"; statusTxt.innerText = "กำลังรอเรียก..."; document.getElementById('eta-box').style.display = 'block';
+                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-black"; badge.className = "absolute top-0 left-0 w-full h-3 bg-blue-600"; statusTxt.innerText = "กำลังรอเรียก..."; document.getElementById('eta-box').style.display = 'block';
                     let qAhead = 0; Object.values(allData).forEach(q => { if (q.status === 'waiting' && q.type === myData.type && q.timestamp < myData.timestamp) qAhead++; });
                     document.getElementById('q-ahead').innerText = qAhead; document.getElementById('eta-time').innerText = Math.ceil((qAhead * AVG_SERVICE_TIME)) || 1;
                     if (qAhead <= 1 && qAhead > 0 && soundEnabled && !notifiedNear) { playBeep('normal'); notifiedNear = true; }
@@ -254,63 +258,63 @@
         };
 
         // ==========================================
-        // 3. STAFF MODE
+        // 3. STAFF MODE (หน้าจอเจ้าหน้าที่กดเรียกคิว)
         // ==========================================
         const renderStaff = (container) => {
             let currentCounter = 1;
             let currentQID = null;
 
             container.innerHTML = `
-                <div class="min-h-screen bg-slate-100 p-4 md:p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm mb-6">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fa-solid fa-layer-group"></i> เลือกช่องบริการประจำเครื่องของคุณ:</p>
-                            <div class="grid grid-cols-3 gap-3" id="counter-selector-group">
-                                <button data-counter="1" class="counter-tab-btn p-3 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
-                                    <span class="text-lg font-extrabold">ช่อง No. 1</span>
-                                    <span class="text-xs opacity-70">คิว Walk-in</span>
+                <div class="min-h-screen bg-black p-4 md:p-8 text-white">
+                    <div class="max-w-5xl mx-auto">
+                        <div class="bg-gray-900 p-6 rounded-2xl shadow-xl mb-6 border border-gray-800">
+                            <p class="text-xl font-bold text-cyan-400 uppercase tracking-wider mb-4"><i class="fa-solid fa-layer-group"></i> เลือกช่องบริการประจำเครื่องของคุณ:</p>
+                            <div class="grid grid-cols-3 gap-4" id="counter-selector-group">
+                                <button data-counter="1" class="counter-tab-btn p-4 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
+                                    <span class="text-2xl font-black">ช่อง No. 1</span>
+                                    <span class="text-sm opacity-80">คิว Walk-in</span>
                                 </button>
-                                <button data-counter="2" class="counter-tab-btn p-3 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
-                                    <span class="text-lg font-extrabold">ช่อง No. 2</span>
-                                    <span class="text-xs opacity-70">นัดรับวัคซีน</span>
+                                <button data-counter="2" class="counter-tab-btn p-4 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
+                                    <span class="text-2xl font-black">ช่อง No. 2</span>
+                                    <span class="text-sm opacity-80">นัดรับวัคซีน</span>
                                 </button>
-                                <button data-counter="3" class="counter-tab-btn p-3 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
-                                    <span class="text-lg font-extrabold">ช่อง No. 3</span>
-                                    <span class="text-xs opacity-70">นัดฝึกคอร์ส</span>
+                                <button data-counter="3" class="counter-tab-btn p-4 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
+                                    <span class="text-2xl font-black">ช่อง No. 3</span>
+                                    <span class="text-sm opacity-80">นัดฝึกคอร์ส</span>
                                 </button>
                             </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
-                                <span class="text-sm font-semibold text-slate-500"><i class="fa-solid fa-user-tie mr-1"></i> เจ้าหน้าที่กำลังสแตนด์บาย</span>
-                                <div id="counter-type-badge" class="text-xs font-bold px-3 py-1 rounded-full"></div>
+                            <div class="mt-5 pt-4 border-t border-gray-800 flex justify-between items-center">
+                                <span class="text-lg font-bold text-gray-400"><i class="fa-solid fa-user-tie mr-2 text-blue-400"></i> ระบบพร้อมใช้งาน</span>
+                                <div id="counter-type-badge" class="text-base font-black px-4 py-1.5 rounded-full border"></div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-md text-center border-t-4 border-blue-500">
-                                <h2 class="text-gray-400 text-sm uppercase tracking-wide">กำลังให้บริการ</h2>
-                                <div id="staff-current-q" class="text-6xl font-black text-slate-800 my-8 min-h-[80px]">-</div>
-                                <button id="btn-finish" disabled class="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white font-bold py-3 rounded-lg transition shadow">
-                                    <i class="fa-solid fa-check mr-1"></i> จบงาน (Finish)
+                            <div class="bg-gray-900 p-8 rounded-2xl shadow-xl text-center border-t-8 border-blue-500">
+                                <h2 class="text-gray-400 text-xl font-bold uppercase tracking-wide">กำลังให้บริการคิว</h2>
+                                <div id="staff-current-q" class="text-8xl font-black text-cyan-300 my-8 min-h-[100px] tracking-tight">-</div>
+                                <button id="btn-finish" disabled class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-600 text-white font-black text-2xl py-5 rounded-xl transition shadow-lg">
+                                    <i class="fa-solid fa-check mr-2"></i> กดจบงานคิวนี้ (Finish)
                                 </button>
                             </div>
                             
-                            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-green-500 flex flex-col">
-                                <div class="flex justify-between items-end mb-4">
+                            <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border-t-8 border-cyan-400 flex flex-col">
+                                <div class="flex justify-between items-center mb-6">
                                     <div>
-                                        <h2 class="text-gray-400 text-sm uppercase">คิวรอในแผนกคุณ</h2>
-                                        <div class="text-3xl font-black text-slate-800" id="staff-wait-count">0</div>
+                                        <h2 class="text-gray-400 text-lg font-bold uppercase">จำนวนคิวที่รอในระบบ</h2>
+                                        <div class="text-5xl font-black text-white mt-1" id="staff-wait-count">0</div>
                                     </div>
-                                    <button id="btn-call" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg active:scale-95 transition">
+                                    <button id="btn-call" class="bg-cyan-500 hover:bg-cyan-400 text-black text-2xl font-black py-5 px-8 rounded-xl shadow-xl active:scale-95 transition">
                                         เรียกคิวถัดไป <i class="fa-solid fa-bullhorn ml-1"></i>
                                     </button>
                                 </div>
-                                <div class="flex-1 overflow-y-auto max-h-[250px] bg-slate-50 rounded-xl p-2 border border-slate-100">
-                                    <ul id="staff-wait-list" class="space-y-2 text-sm"></ul>
+                                <div class="flex-1 overflow-y-auto max-h-[250px] bg-black rounded-xl p-3 border border-gray-800">
+                                    <ul id="staff-wait-list" class="space-y-3"></ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="text-center mt-12"><button id="btn-reset" class="text-xs text-red-300 underline hover:text-red-500">Reset System</button></div>
+                    <div class="text-center mt-16"><button id="btn-reset" class="text-sm text-gray-600 underline hover:text-red-400">ล้างฐานข้อมูลคิวทั้งหมด (Reset System)</button></div>
                 </div>
             `;
 
@@ -319,9 +323,9 @@
                     const btnNum = parseInt(btn.getAttribute('data-counter'));
                     const conf = getCounterConfig(btnNum);
                     if (btnNum === currentCounter) {
-                        btn.className = `counter-tab-btn p-3 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1 ${conf.activeBtn}`;
+                        btn.className = `counter-tab-btn p-4 rounded-xl border-2 text-center transition flex flex-col items-center justify-center gap-1 ${conf.activeBtn}`;
                     } else {
-                        btn.className = `counter-tab-btn p-3 rounded-xl border-slate-200 bg-white text-slate-500 hover:bg-slate-50 text-center transition flex flex-col items-center justify-center gap-1`;
+                        btn.className = `counter-tab-btn p-4 rounded-xl border-gray-800 bg-gray-900 text-gray-500 hover:bg-gray-800 text-center transition flex flex-col items-center justify-center gap-1`;
                     }
                 });
             };
@@ -330,8 +334,8 @@
                 updateTabButtonsUI();
                 const config = getCounterConfig(currentCounter);
                 const badge = document.getElementById('counter-type-badge');
-                badge.className = `text-xs font-bold px-3 py-1 rounded-full ${config.color}`;
-                badge.innerText = `โหมดบริการ: คิว ${config.label}`;
+                badge.className = `text-base font-black px-4 py-1.5 rounded-full ${config.color}`;
+                badge.innerText = `โหมดเรียกคิว: ${config.label}`;
 
                 const queues = Object.entries(data || {}).map(([k, v]) => ({ id: k, ...v }));
                 const myServing = queues.find(q => q.status === 'serving' && parseInt(q.counter) === currentCounter);
@@ -341,21 +345,21 @@
                     document.getElementById('staff-current-q').innerText = myServing.number;
                     document.getElementById('btn-finish').disabled = false;
                     document.getElementById('btn-call').disabled = true;
-                    document.getElementById('btn-call').classList.add('opacity-50');
+                    document.getElementById('btn-call').classList.add('opacity-30');
                 } else {
                     currentQID = null;
                     document.getElementById('staff-current-q').innerText = "-";
                     document.getElementById('btn-finish').disabled = true;
                     document.getElementById('btn-call').disabled = false;
-                    document.getElementById('btn-call').classList.remove('opacity-50');
+                    document.getElementById('btn-call').classList.remove('opacity-30');
                 }
 
                 const waiting = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp);
                 document.getElementById('staff-wait-count').innerText = waiting.length;
                 document.getElementById('staff-wait-list').innerHTML = waiting.map(q => 
-                    `<li class="flex justify-between p-2.5 bg-white rounded-lg shadow-sm border border-slate-100 animate-fade-in">
-                        <span class="font-bold text-slate-700"><i class="fa-solid fa-ticket text-slate-400 mr-1 text-xs"></i> ${q.number}</span>
-                        <span class="text-gray-400 text-xs">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
+                    `<li class="flex justify-between items-center p-3.5 bg-gray-900 border border-gray-800 rounded-xl animate-fade-in">
+                        <span class="text-2xl font-black text-cyan-300"><i class="fa-solid fa-ticket text-blue-500 mr-2 text-lg"></i> ${q.number}</span>
+                        <span class="text-gray-400 text-lg">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
                      </li>`
                 ).join('');
             };
@@ -373,49 +377,49 @@
                 const queues = Object.entries(snap.val() || {}).map(([k,v]) => ({id:k, ...v}));
                 const nextQ = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp)[0];
                 if (nextQ) update(ref(db, `queues/${nextQ.id}`), { status: 'serving', counter: currentCounter, callTime: Date.now() });
-                else alert(`ไม่มีคิวประเภท ${config.label} รออยู่เลยครับ`);
+                else alert(`ไม่มีคิวประเภท ${config.label} ในระบบแล้วครับ`);
             };
 
             document.getElementById('btn-finish').onclick = () => { if (currentQID) update(ref(db, `queues/${currentQID}`), { status: 'done' }); };
-            document.getElementById('btn-reset').onclick = () => { if(confirm('ลบข้อมูลคิวทั้งหมดในฐานข้อมูลหรือไม่?')) set(ref(db, 'queues'), null); }
+            document.getElementById('btn-reset').onclick = () => { if(confirm('⚠️ คำเตือน: คุณกำลังจะลบข้อมูลคิวทั้งหมดในระบบ ต้องการดำเนินการต่อใช่หรือไม่?')) set(ref(db, 'queues'), null); }
             onValue(ref(db, 'queues'), (snap) => updateUI(snap.val()));
         };
 
         // ==========================================
-        // 4. TV DISPLAY MODE
+        // 4. TV DISPLAY MODE (หน้าจอทีวีรวม - ตัวหนังสือใหญ่ยักษ์พิเศษ)
         // ==========================================
         const renderTV = (container) => {
             let lastAnnounce = "";
             container.innerHTML = `
-                <div class="relative w-screen h-screen bg-slate-900 text-white overflow-hidden flex flex-col md:flex-row">
-                    <div id="sound-overlay" class="absolute inset-0 bg-black/95 z-50 flex items-center justify-center cursor-pointer">
-                        <div class="text-center">
-                            <i class="fa-solid fa-play text-6xl mb-4 text-emerald-400 animate-pulse"></i>
-                            <h2 class="text-2xl font-bold">คลิกตรงนี้เพื่อเริ่มทำงานระบบทีวีคิว + วิดีโอ</h2>
-                            <p class="text-sm text-gray-500 mt-2">(เบราว์เซอร์บังคับให้คลิกก่อนเพื่อยอมรับระบบเสียงประกาศและวิดีโอ)</p>
+                <div class="relative w-screen h-screen bg-black text-white overflow-hidden flex flex-col md:flex-row">
+                    <div id="sound-overlay" class="absolute inset-0 bg-black/98 z-50 flex items-center justify-center cursor-pointer">
+                        <div class="text-center p-10 border-4 border-blue-500 rounded-3xl max-w-lg bg-gray-900">
+                            <i class="fa-solid fa-play text-8xl mb-6 text-cyan-400 animate-pulse"></i>
+                            <h2 class="text-4xl font-black mb-2">เปิดระบบจอทีวีคิว</h2>
+                            <p class="text-xl text-gray-400 mt-2">คลิกหน้าจอนี้เพื่อเริ่มต้นเสียงประกาศระบบคิวและวิดีโอ</p>
                         </div>
                     </div>
-                    <div class="w-full md:w-[55%] h-full bg-black relative flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-800">
+                    <div class="w-full md:w-[50%] h-full bg-black relative flex items-center justify-center border-b md:border-b-0 md:border-r-2 border-gray-800">
                         <video id="tv-player" class="w-full h-full object-contain" loop muted playsinline>
                             <source src="video.mp4" type="video/mp4">
                         </video>
-                        <div class="absolute top-4 left-4 bg-black/50 px-3 py-1 rounded text-xs text-gray-400 pointer-events-none">
-                            <i class="fa-solid fa-film mr-1"></i> Media Player
+                        <div class="absolute top-4 left-4 bg-blue-900/80 border border-blue-400 px-4 py-1.5 rounded-lg text-lg text-white font-bold pointer-events-none">
+                            <i class="fa-solid fa-film mr-2 text-cyan-300"></i> สื่อประชาสัมพันธ์
                         </div>
                     </div>
-                    <div class="w-full md:w-[45%] h-full flex flex-col justify-between bg-slate-900">
-                        <div class="p-6 flex-1 flex flex-col min-h-[50%] justify-start">
-                            <h1 class="text-2xl font-bold text-slate-400 mb-4 tracking-wider border-b border-slate-800 pb-2 flex justify-between items-center">
+                    <div class="w-full md:w-[50%] h-full flex flex-col justify-between bg-black">
+                        <div class="p-6 flex-1 flex flex-col min-h-[55%] justify-start">
+                            <h1 class="text-3xl font-black text-cyan-400 mb-6 tracking-wider border-b-4 border-blue-900 pb-3 flex justify-between items-center">
                                 <span>กำลังเรียก / NOW SERVING</span>
-                                <i class="fa-solid fa-bullhorn text-emerald-500 text-sm animate-bounce"></i>
+                                <i class="fa-solid fa-bullhorn text-cyan-400 text-2xl animate-bounce"></i>
                             </h1>
-                            <div id="tv-serving-list" class="space-y-4 overflow-y-auto max-h-[380px] pr-1"></div>
+                            <div id="tv-serving-list" class="space-y-5 overflow-y-auto max-h-[480px] pr-1"></div>
                         </div>
-                        <div class="p-6 bg-slate-950 border-t border-slate-800 h-[30%] min-h-[180px]">
-                            <h2 class="text-xl font-bold text-slate-500 mb-3 uppercase tracking-wide flex items-center gap-2">
-                                <i class="fa-solid fa-list-ol text-xs"></i> คิวถัดไป / NEXT
+                        <div class="p-6 bg-gray-950 border-t-4 border-blue-900 h-[28%] min-h-[180px]">
+                            <h2 class="text-2xl font-black text-blue-400 mb-4 uppercase tracking-wide flex items-center gap-3">
+                                <i class="fa-solid fa-list-ol text-sm text-cyan-300"></i> คิวถัดไป / NEXT
                             </h2>
-                            <ul id="tv-waiting-list" class="grid grid-cols-2 gap-3 text-xl font-semibold"></ul>
+                            <ul id="tv-waiting-list" class="grid grid-cols-3 gap-4 text-3xl font-black"></ul>
                         </div>
                     </div>
                 </div>
@@ -456,27 +460,28 @@
                     }
                 }
                 
+                // ออกแบบการ์ดคิวที่จอทีวี: พื้นหลังดำ ตัวคิวใหญ่มาก ป้ายช่องบริการเน้นโทนสีน้ำเงิน-ฟ้าสว่างชัดเจน
                 document.getElementById('tv-serving-list').innerHTML = serving.map((q, idx) => {
                     const isNew = idx === 0; 
                     return `
-                    <div class="${isNew ? 'bg-white text-slate-900 border-l-8 border-emerald-500 animate-pulse-green' : 'bg-slate-800 text-slate-400 border-l-4 border-slate-600'} 
-                        p-4 rounded-xl shadow-lg flex justify-between items-center transition-all">
+                    <div class="${isNew ? 'bg-gray-900 border-2 border-cyan-400 animate-pulse-cyan shadow-cyan-500/50' : 'bg-gray-950 border border-gray-900 text-gray-500'} 
+                        p-5 rounded-2xl shadow-xl flex justify-between items-center transition-all">
                         <div>
-                            <span class="${isNew ? 'text-xs' : 'text-[11px]'} block opacity-60 font-semibold">หมายเลขคิว</span>
-                            <span class="${isNew ? 'text-6xl' : 'text-4xl'} font-black tracking-tight">${q.number}</span>
+                            <span class="${isNew ? 'text-lg text-cyan-400' : 'text-sm text-gray-600'} block font-bold mb-1">หมายเลขคิว</span>
+                            <span class="${isNew ? 'text-8xl text-white' : 'text-5xl text-gray-400'} font-black tracking-tight">${q.number}</span>
                         </div>
                         <div class="text-right">
-                            <span class="${isNew ? 'text-xs' : 'text-[11px]'} block opacity-60 font-semibold">ช่องบริการ</span>
-                            <span class="${isNew ? 'text-5xl text-blue-600' : 'text-3xl text-slate-200'} font-bold">${q.counter}</span>
+                            <span class="${isNew ? 'text-lg text-cyan-400' : 'text-sm text-gray-600'} block font-bold mb-1">ช่องบริการ</span>
+                            <span class="${isNew ? 'text-7xl bg-blue-700 text-white border border-blue-400 px-6 py-1 rounded-2xl' : 'text-4xl bg-gray-900 text-gray-500 px-4 py-1 rounded-xl'} font-black">${q.counter}</span>
                         </div>
                     </div>`;
                 }).join('');
 
                 const waiting = queues.filter(q => q.status === 'waiting').sort((a,b) => a.timestamp - b.timestamp).slice(0, 6);
                 document.getElementById('tv-waiting-list').innerHTML = waiting.map(q => `
-                    <li class="flex items-center gap-2 text-slate-300 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800/80">
-                        <i class="fa-solid fa-circle text-[8px] text-yellow-500 animate-ping"></i>
-                        <span class="font-mono font-bold text-2xl text-yellow-400">${q.number}</span>
+                    <li class="flex items-center justify-center gap-3 bg-gray-900 px-4 py-3 rounded-xl border border-blue-900/60 shadow-inner">
+                        <i class="fa-solid fa-circle text-xs text-cyan-400 animate-ping"></i>
+                        <span class="font-bold text-4xl text-cyan-300 tracking-tight">${q.number}</span>
                     </li>
                 `).join('');
             });
