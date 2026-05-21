@@ -258,7 +258,7 @@
         };
 
         // ==========================================
-        // 3. STAFF MODE 
+        // 3. STAFF MODE (เพิ่มกลไกปุ่ม Recall เรียกซ้ำ)
         // ==========================================
         const renderStaff = (container) => {
             let currentCounter = 1;
@@ -290,12 +290,19 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-8 rounded-3xl shadow-xl text-center border-t-8 border-pink-400">
-                                <h2 class="text-slate-500 text-xl font-bold uppercase tracking-wide">คิวหนูๆ ที่ตรวจอยู่ปัจจุบัน</h2>
-                                <div id="staff-current-q" class="text-8xl font-black text-pink-600 my-6 min-h-[100px] tracking-tight">-</div>
-                                <button id="btn-finish" disabled class="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black text-2xl py-5 rounded-2xl transition shadow-md border-b-4 border-pink-700">
-                                    <i class="fa-solid fa-smile mr-2"></i> กดบันทึกเสร็จงาน (Finish)
-                                </button>
+                            <div class="bg-white p-8 rounded-3xl shadow-xl text-center border-t-8 border-pink-400 flex flex-col justify-between">
+                                <div>
+                                    <h2 class="text-slate-500 text-xl font-bold uppercase tracking-wide">คิวหนูๆ ที่ตรวจอยู่ปัจจุบัน</h2>
+                                    <div id="staff-current-q" class="text-8xl font-black text-pink-600 my-6 min-h-[100px] tracking-tight">-</div>
+                                </div>
+                                <div class="flex flex-col gap-3 w-full">
+                                    <button id="btn-recall" disabled class="w-full bg-amber-400 hover:bg-amber-500 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 font-black text-xl py-4 rounded-2xl transition shadow-md border-b-4 border-amber-600">
+                                        <i class="fa-solid fa-bullhorn mr-2"></i> เรียกคิวซ้ำ (Recall)
+                                    </button>
+                                    <button id="btn-finish" disabled class="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black text-xl py-4 rounded-2xl transition shadow-md border-b-4 border-pink-700">
+                                        <i class="fa-solid fa-smile mr-2"></i> กดบันทึกเสร็จงาน (Finish)
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="bg-white p-8 rounded-3xl shadow-xl border-t-8 border-emerald-400 flex flex-col">
@@ -344,12 +351,14 @@
                     currentQID = myServing.id;
                     document.getElementById('staff-current-q').innerText = myServing.number;
                     document.getElementById('btn-finish').disabled = false;
+                    document.getElementById('btn-recall').disabled = false; // เปิดปุ่มเรียกซ้ำ
                     document.getElementById('btn-call').disabled = true;
                     document.getElementById('btn-call').classList.add('opacity-30');
                 } else {
                     currentQID = null;
                     document.getElementById('staff-current-q').innerText = "-";
                     document.getElementById('btn-finish').disabled = true;
+                    document.getElementById('btn-recall').disabled = true; // ปิดปุ่มเรียกซ้ำ
                     document.getElementById('btn-call').disabled = false;
                     document.getElementById('btn-call').classList.remove('opacity-30');
                 }
@@ -381,13 +390,20 @@
                 else alert(`ไม่มีคิวประเภท ${config.label} เหลือในระบบแล้วค่ะคุณพยาบาล`);
             };
 
+            // กลไกปุ่ม Recall: อัปเดตเวลา callTime ใหม่ เพื่อให้จอทีวีสะดุ้งรับสัญญาณและประกาศเรียกซ้ำทันที
+            document.getElementById('btn-recall').onclick = () => {
+                if (currentQID) {
+                    update(ref(db, `queues/${currentQID}`), { callTime: Date.now() });
+                }
+            };
+
             document.getElementById('btn-finish').onclick = () => { if (currentQID) update(ref(db, `queues/${currentQID}`), { status: 'done' }); };
             document.getElementById('btn-reset').onclick = () => { if(confirm('ต้องการล้างประวัติคิววันนี้ทั้งหมดใช่หรือไม่คะ?')) set(ref(db, 'queues'), null); }
             onValue(ref(db, 'queues'), (snap) => updateUI(snap.val()));
         };
 
         // ==========================================
-        // 4. TV DISPLAY MODE (ปรับแก้โครงสร้าง Flexbox เพื่อป้องกันข้อความทับกัน 100%)
+        // 4. TV DISPLAY MODE 
         // ==========================================
         const renderTV = (container) => {
             let lastAnnounce = "";
@@ -461,8 +477,6 @@
                     }
                 }
                 
-                // [จุดแก้ไข] เปลี่ยนแปลงสไตล์แถวขวามือ: ปรับเป็น flex-col (แนวตั้ง) หรือแยกส่วนออกจากกันให้ชัดเจน
-                // และทำการใส่ gap-4 ปล่อยให้มันขยายตัวตามความกว้างของหน้าจอได้อย่างอิสระ ไม่บีบอัดกันในพื้นที่เล็กๆ แล้วครับ
                 document.getElementById('tv-serving-list').innerHTML = serving.map((q, idx) => {
                     const isNew = idx === 0; 
                     return `
