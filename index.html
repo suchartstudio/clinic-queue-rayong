@@ -20,9 +20,9 @@
     <style>
         body { 
             font-family: 'Sarabun', sans-serif; 
-            background-color: #F0FDF4; /* สีเขียวมิ้นต์อ่อนๆ สบายตา */
+            background-color: #F0FDF4; 
         }
-        /* แอนิเมชันชีพจรกระตุ้นความสนใจโทนฟ้าสว่าง */
+        
         @keyframes pulse-sky {
             0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.8); }
             50% { box-shadow: 0 0 0 30px rgba(14, 165, 233, 0); }
@@ -81,12 +81,12 @@
         const mode = params.get('mode') || 'kiosk'; 
         const AVG_SERVICE_TIME = 5; 
 
-        // ตัวตั้งค่าสีป้าย/ปุ่ม: โทนสีสันสดใสพาสเทลสไตล์สวนสนุกและคลินิกเด็ก
+        // การตั้งค่าสีของป้ายหน้า Staff: ปรับข้อความให้เข้มเด่นชัดเจน อ่านง่าย ไม่กลืนกับพื้นหลัง
         const getCounterConfig = (counterNum) => {
-            if (counterNum === 1) return { type: 'walkin', label: 'Walk-in (ตรวจทั่วไป)', color: 'bg-sky-100 text-sky-800 border-sky-300', activeBtn: 'ring-4 ring-sky-400 bg-sky-500 text-white shadow-xl' };
-            if (counterNum === 2) return { type: 'vaccine', label: 'นัดรับวัคซีน', color: 'bg-pink-100 text-pink-800 border-pink-300', activeBtn: 'ring-4 ring-pink-400 bg-pink-500 text-white shadow-xl' };
-            if (counterNum === 3) return { type: 'course', label: 'นัดฝึกคอร์ส', color: 'bg-emerald-100 text-emerald-800 border-emerald-300', activeBtn: 'ring-4 ring-emerald-400 bg-emerald-500 text-white shadow-xl' };
-            return { type: 'walkin', label: 'Walk-in', color: 'bg-sky-100 text-sky-800 border-sky-300', activeBtn: 'ring-4 ring-sky-400 bg-sky-500 text-white' };
+            if (counterNum === 1) return { type: 'walkin', label: 'Walk-in (ตรวจทั่วไป)', color: 'bg-sky-500 text-white border-sky-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white shadow-xl font-black' };
+            if (counterNum === 2) return { type: 'vaccine', label: 'นัดรับวัคซีน', color: 'bg-pink-500 text-white border-pink-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white shadow-xl font-black' };
+            if (counterNum === 3) return { type: 'course', label: 'นัดฝึกคอร์ส', color: 'bg-emerald-500 text-white border-emerald-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white shadow-xl font-black' };
+            return { type: 'walkin', label: 'Walk-in', color: 'bg-sky-500 text-white border-sky-600', activeBtn: 'ring-4 ring-pink-300 bg-pink-500 text-white' };
         };
 
         const playBeep = (type = 'normal') => {
@@ -103,7 +103,7 @@
                         osc.connect(gain);
                         gain.connect(ctx.destination);
                         osc.type = 'sine'; 
-                        osc.frequency.setValueAtTime(587.33, now + delay); // โน้ตเสียง D5 (สดใส ไม่ตกใจ)
+                        osc.frequency.setValueAtTime(587.33, now + delay); 
                         osc.frequency.linearRampToValueAtTime(880, now + delay + 0.2); 
                         gain.gain.setValueAtTime(0.3, now + delay); 
                         gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.2);
@@ -116,7 +116,7 @@
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.type = 'sine';
-                    osc.frequency.value = 523.25; // โน้ตเสียง C5 นุ่มนวล
+                    osc.frequency.value = 523.25; 
                     gain.gain.setValueAtTime(0.1, now); 
                     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                     osc.start(now);
@@ -138,7 +138,7 @@
         };
 
         // ==========================================
-        // 1. KIOSK MODE (หน้าตู้กดคิว - มีโลโก้ นำเลขช่องออก ธีมสดใส)
+        // 1. KIOSK MODE (ปรับเป็นปุ่มสีชมพู ตัวหนังสือขาว ทุกปุ่ม)
         // ==========================================
         const renderKiosk = (container) => {
             let resetTimer = null;
@@ -164,24 +164,24 @@
                         </div>
 
                         <div id="kiosk-buttons" class="flex flex-col gap-6 w-full">
-                            <button id="btn-q-walkin" class="w-full bg-sky-400 hover:bg-sky-500 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-sky-600">
-                                <i class="fa-solid fa-baby text-5xl"></i> Walk-in (ตรวจทั่วไป)
+                            <button id="btn-q-walkin" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-pink-700">
+                                <i class="fa-solid fa-baby text-5xl text-white"></i> Walk-in (ตรวจทั่วไป)
                             </button>
-                            <button id="btn-q-vaccine" class="w-full bg-pink-400 hover:bg-pink-500 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-pink-600">
-                                <i class="fa-solid fa-teddy-bear fa-syringe text-5xl"></i> นัดรับวัคซีน
+                            <button id="btn-q-vaccine" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-pink-700">
+                                <i class="fa-solid fa-syringe text-5xl text-white"></i> นัดรับวัคซีน
                             </button>
-                            <button id="btn-q-course" class="w-full bg-emerald-400 hover:bg-emerald-500 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-emerald-600">
-                                <i class="fa-solid fa-gamepad text-5xl"></i> นัดฝึกคอร์สเรียนรู้
+                            <button id="btn-q-course" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-4xl font-extrabold py-8 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-4 border-b-8 border-pink-700">
+                                <i class="fa-solid fa-gamepad text-5xl text-white"></i> นัดฝึกคอร์สเรียนรู้
                             </button>
                         </div>
 
                         <div id="kiosk-result" class="hidden w-full animate-fade-in flex flex-col items-center">
                             <p class="text-amber-500 text-3xl font-black"><i class="fa-solid fa-heart text-pink-400"></i> หมายเลขคิวของหนูคือ</p>
-                            <div id="q-number" class="text-9xl font-black text-sky-500 my-6 tracking-tight bg-sky-50 px-10 py-4 rounded-3xl border-4 border-dashed border-sky-300"></div>
+                            <div id="q-number" class="text-9xl font-black text-pink-500 my-6 tracking-tight bg-pink-50 px-10 py-4 rounded-3xl border-4 border-dashed border-pink-300"></div>
                             <div class="bg-amber-50 p-6 rounded-2xl shadow-inner mb-6 border-2 border-amber-200">
                                 <div id="qr-code"></div>
                             </div>
-                            <p class="text-2xl font-black text-pink-500 animate-pulse"><i class="fa-solid fa-camera"></i> คุณแม่สแกนเพื่อรอรับสายตรวจบนมือถือได้เลยนะคะ</p>
+                            <p class="text-2xl font-black text-sky-500 animate-pulse"><i class="fa-solid fa-camera"></i> คุณแม่สแกนเพื่อรอรับสายตรวจบนมือถือได้เลยนะคะ</p>
                             <button id="btn-cancel" class="mt-8 text-gray-400 underline text-xl hover:text-gray-600">กลับหน้าแรก</button>
                         </div>
                     </div>
@@ -210,7 +210,7 @@
         };
 
         // ==========================================
-        // 2. USER MODE (หน้าจอมือถือผู้ปกครอง - คลินิกเด็กสดใส)
+        // 2. USER MODE 
         // ==========================================
         const renderUser = (container) => {
             const ticketId = params.get('id');
@@ -220,16 +220,16 @@
             container.innerHTML = `
                 <div class="min-h-screen bg-amber-50 flex flex-col items-center p-6 transition-colors duration-500" id="user-bg">
                     <button id="btn-enable-sound" class="mb-6 bg-white border-4 border-yellow-400 text-amber-600 px-6 py-3 rounded-full text-lg font-bold flex items-center gap-3 shadow-md animate-bounce"><i class="fa-solid fa-volume-high text-yellow-500"></i> แตะตรงนี้เพื่อเปิดเสียงเตือนคิว</button>
-                    <div id="capture-area" class="bg-white w-full max-w-md rounded-3xl shadow-xl p-8 text-center relative overflow-hidden border-4 border-sky-200">
+                    <div id="capture-area" class="bg-white w-full max-w-md rounded-3xl shadow-xl p-8 text-center relative overflow-hidden border-4 border-pink-200">
                         <div class="border-b border-gray-100 pb-4 mb-4">
-                            <div class="text-2xl font-black text-sky-500"><i class="fa-solid fa-rainbow"></i> คลินิกเด็กระยอง</div>
+                            <div class="text-2xl font-black text-pink-500"><i class="fa-solid fa-rainbow"></i> คลินิกเด็กระยอง</div>
                             <div class="text-sm text-gray-400 font-bold" id="timestamp-display"></div>
                         </div>
                         <div id="status-badge" class="absolute top-0 left-0 w-full h-4 bg-gray-200"></div>
                         <p class="text-gray-500 text-xl font-bold mt-4">บัตรคิวออนไลน์ของหนู</p>
-                        <h1 id="my-q" class="text-8xl font-black text-amber-500 my-4 tracking-tight">-</h1>
+                        <h1 id="my-q" class="text-8xl font-black text-pink-500 my-4 tracking-tight">-</h1>
                         <div class="bg-yellow-50 border-4 border-dashed border-yellow-300 rounded-2xl p-6 my-6">
-                            <p class="text-3xl font-black text-sky-600" id="status-text">กำลังรอเรียกคิว...</p>
+                            <p class="text-3xl font-black text-pink-600" id="status-text">กำลังรอเรียกคิว...</p>
                             <div id="eta-box" class="mt-4 text-xl text-gray-500 font-bold">รออีก <span id="q-ahead" class="font-black text-pink-500 text-3xl">0</span> คิว (~<span id="eta-time" class="text-emerald-600 text-3xl">-</span> นาทีนะคะ)</div>
                         </div>
                     </div>
@@ -237,7 +237,7 @@
                 </div>
             `;
             const btnSound = document.getElementById('btn-enable-sound');
-            btnSound.onclick = () => { soundEnabled = true; playBeep('normal'); btnSound.className = "mb-6 bg-sky-400 text-white px-6 py-3 rounded-full text-lg font-bold flex items-center gap-3 shadow-lg border-b-4 border-sky-600"; btnSound.innerHTML = `<i class="fa-solid fa-bell animate-swing"></i> ระบบส่งเสียงเปิดแล้วค่ะ`; };
+            btnSound.onclick = () => { soundEnabled = true; playBeep('normal'); btnSound.className = "mb-6 bg-pink-400 text-white px-6 py-3 rounded-full text-lg font-bold flex items-center gap-3 shadow-lg border-b-4 border-pink-600"; btnSound.innerHTML = `<i class="fa-solid fa-bell animate-swing"></i> ระบบส่งเสียงเปิดแล้วค่ะ`; };
             document.getElementById('btn-save-ticket').onclick = () => { html2canvas(document.getElementById('capture-area'), { backgroundColor: '#FFFFFF', scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Kids-Clinic-Ticket.png`; link.href = canvas.toDataURL("image/png"); link.click(); }); };
             onValue(ref(db, 'queues'), (snapshot) => {
                 const allData = snapshot.val() || {}; const myData = allData[ticketId];
@@ -250,7 +250,7 @@
                     statusTxt.innerHTML = `หนูจ๋า ถึงคิวแล้วค่ะ! <span class="text-3xl block mt-3 text-white font-black bg-pink-500 px-4 py-3 rounded-2xl shadow border-b-4 border-pink-700">ไปที่ ช่องบริการที่ ${myData.counter} นะคะ</span>`; document.getElementById('eta-box').style.display = 'none';
                     if (soundEnabled && !notifiedServe) { playBeep('alarm'); vibrateDevice([500, 200, 500]); notifiedServe = true; }
                 } else if (myData.status === 'waiting') {
-                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-amber-50"; badge.className = "absolute top-0 left-0 w-full h-4 bg-sky-400"; statusTxt.innerText = "กำลังรอคุณหมอเรียกคุยค่ะ..."; document.getElementById('eta-box').style.display = 'block';
+                    bg.className = "min-h-screen flex flex-col items-center p-6 bg-amber-50"; badge.className = "absolute top-0 left-0 w-full h-4 bg-pink-400"; statusTxt.innerText = "กำลังรอคุณหมอเรียกคุยค่ะ..."; document.getElementById('eta-box').style.display = 'block';
                     let qAhead = 0; Object.values(allData).forEach(q => { if (q.status === 'waiting' && q.type === myData.type && q.timestamp < myData.timestamp) qAhead++; });
                     document.getElementById('q-ahead').innerText = qAhead; document.getElementById('eta-time').innerText = Math.ceil((qAhead * AVG_SERVICE_TIME)) || 1;
                     if (qAhead <= 1 && qAhead > 0 && soundEnabled && !notifiedNear) { playBeep('normal'); notifiedNear = true; }
@@ -259,63 +259,63 @@
         };
 
         // ==========================================
-        // 3. STAFF MODE (หน้าจอพยาบาล/เจ้าหน้าที่ คลินิกเด็กสดใส)
+        // 3. STAFF MODE (แก้ปัญหาเรื่องสีฟอนต์จาง/กลืนกับพื้นหลัง ทำให้อ่านง่ายขึ้น 100%)
         // ==========================================
         const renderStaff = (container) => {
             let currentCounter = 1;
             let currentQID = null;
 
             container.innerHTML = `
-                <div class="min-h-screen bg-sky-50/50 p-4 md:p-8 text-gray-700">
+                <div class="min-h-screen bg-slate-100 p-4 md:p-8 text-slate-800">
                     <div class="max-w-5xl mx-auto">
-                        <div class="bg-white p-6 rounded-3xl shadow-lg mb-6 border-4 border-sky-100">
-                            <p class="text-xl font-bold text-sky-600 mb-4"><i class="fa-solid fa-hospital-user mr-1"></i> เลือกห้องตรวจประจำเครื่องของคุณ:</p>
+                        <div class="bg-white p-6 rounded-3xl shadow-lg mb-6 border-4 border-pink-100">
+                            <p class="text-xl font-bold text-slate-700 mb-4"><i class="fa-solid fa-hospital-user mr-2 text-pink-500"></i> เลือกห้องตรวจประจำเครื่องของคุณ:</p>
                             <div class="grid grid-cols-3 gap-4" id="counter-selector-group">
-                                <button data-counter="1" class="counter-tab-btn p-4 rounded-2xl border-4 text-center transition flex flex-col items-center justify-center gap-1">
+                                <button data-counter="1" class="counter-tab-btn p-4 rounded-2xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
                                     <span class="text-2xl font-black">ห้อง No. 1</span>
-                                    <span class="text-sm font-bold opacity-80">ตรวจทั่วไป (Walk-in)</span>
+                                    <span class="text-sm font-bold opacity-90">ตรวจทั่วไป (Walk-in)</span>
                                 </button>
-                                <button data-counter="2" class="counter-tab-btn p-4 rounded-2xl border-4 text-center transition flex flex-col items-center justify-center gap-1">
+                                <button data-counter="2" class="counter-tab-btn p-4 rounded-2xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
                                     <span class="text-2xl font-black">ห้อง No. 2</span>
-                                    <span class="text-sm font-bold opacity-80">ห้องรับวัคซีน</span>
+                                    <span class="text-sm font-bold opacity-90">ห้องรับวัคซีน</span>
                                 </button>
-                                <button data-counter="3" class="counter-tab-btn p-4 rounded-2xl border-4 text-center transition flex flex-col items-center justify-center gap-1">
+                                <button data-counter="3" class="counter-tab-btn p-4 rounded-2xl border-2 text-center transition flex flex-col items-center justify-center gap-1">
                                     <span class="text-2xl font-black">ห้อง No. 3</span>
-                                    <span class="text-sm font-bold opacity-80">ห้องฝึกทักษะ</span>
+                                    <span class="text-sm font-bold opacity-90">ห้องฝึกทักษะ</span>
                                 </button>
                             </div>
-                            <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                <span class="text-base font-bold text-gray-400"><i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> เจ้าหน้าที่สแตนด์บายเรียบร้อย</span>
+                            <div class="mt-5 pt-4 border-t border-slate-200 flex justify-between items-center">
+                                <span class="text-base font-bold text-slate-500"><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i> ระบบเจ้าหน้าที่พร้อมทำงาน</span>
                                 <div id="counter-type-badge" class="text-lg font-black px-5 py-1.5 rounded-full border shadow-sm"></div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-8 rounded-3xl shadow-md text-center border-t-8 border-sky-400">
-                                <h2 class="text-gray-400 text-xl font-bold uppercase tracking-wide">คิวหนูๆ ที่ตรวจอยู่</h2>
-                                <div id="staff-current-q" class="text-8xl font-black text-amber-500 my-6 min-h-[100px] tracking-tight">-</div>
-                                <button id="btn-finish" disabled class="w-full bg-sky-400 hover:bg-sky-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-black text-2xl py-5 rounded-2xl transition shadow-md border-b-4 border-sky-600">
-                                    <i class="fa-solid fa-smile mr-2"></i> บันทึกเสร็จสิ้นงาน (Finish)
+                            <div class="bg-white p-8 rounded-3xl shadow-xl text-center border-t-8 border-pink-400">
+                                <h2 class="text-slate-500 text-xl font-bold uppercase tracking-wide">คิวหนูๆ ที่ตรวจอยู่ปัจจุบัน</h2>
+                                <div id="staff-current-q" class="text-8xl font-black text-pink-600 my-6 min-h-[100px] tracking-tight">-</div>
+                                <button id="btn-finish" disabled class="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black text-2xl py-5 rounded-2xl transition shadow-md border-b-4 border-pink-700">
+                                    <i class="fa-solid fa-smile mr-2"></i> กดบันทึกเสร็จงาน (Finish)
                                 </button>
                             </div>
                             
-                            <div class="bg-white p-8 rounded-3xl shadow-md border-t-8 border-pink-400 flex flex-col">
+                            <div class="bg-white p-8 rounded-3xl shadow-xl border-t-8 border-emerald-400 flex flex-col">
                                 <div class="flex justify-between items-center mb-6">
                                     <div>
-                                        <h2 class="text-gray-400 text-lg font-bold">คิวรอเรียกด้านนอก</h2>
-                                        <div class="text-5xl font-black text-pink-500 mt-1" id="staff-wait-count">0</div>
+                                        <h2 class="text-slate-500 text-lg font-bold">จำนวนคิวที่ยังรอตรวจ</h2>
+                                        <div class="text-5xl font-black text-emerald-600 mt-1" id="staff-wait-count">0</div>
                                     </div>
-                                    <button id="btn-call" class="bg-amber-400 hover:bg-amber-500 text-gray-800 text-2xl font-black py-5 px-8 rounded-2xl shadow-md active:scale-95 transition border-b-4 border-amber-600">
+                                    <button id="btn-call" class="bg-amber-400 hover:bg-amber-500 text-slate-800 text-2xl font-black py-5 px-8 rounded-2xl shadow-md active:scale-95 transition border-b-4 border-amber-600">
                                         กดเรียกคิวถัดไป <i class="fa-solid fa-volume-high ml-1"></i>
                                     </button>
                                 </div>
-                                <div class="flex-1 overflow-y-auto max-h-[250px] bg-amber-50/50 rounded-2xl p-3 border-2 border-dashed border-amber-200">
+                                <div class="flex-1 overflow-y-auto max-h-[250px] bg-slate-50 rounded-2xl p-4 border-2 border-slate-200">
                                     <ul id="staff-wait-list" class="space-y-3"></ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="text-center mt-16"><button id="btn-reset" class="text-sm text-gray-400 underline hover:text-red-500">ล้างข้อมูลคิวทั้งหมดของวัน (Reset System)</button></div>
+                    <div class="text-center mt-16"><button id="btn-reset" class="text-sm text-slate-400 underline hover:text-red-500">ล้างข้อมูลคิวทั้งหมดของวัน (Reset System)</button></div>
                 </div>
             `;
 
@@ -326,7 +326,8 @@
                     if (btnNum === currentCounter) {
                         btn.className = `counter-tab-btn p-4 rounded-2xl border-4 text-center transition flex flex-col items-center justify-center gap-1 ${conf.activeBtn}`;
                     } else {
-                        btn.className = `counter-tab-btn p-4 rounded-2xl border-gray-200 bg-white text-gray-400 hover:bg-gray-50 text-center transition flex flex-col items-center justify-center gap-1`;
+                        // ปรับปุ่มที่ไม่ได้เลือกให้ออกโทนเข้มชัดเจนขึ้น ไม่จางหายไปกับพื้นหลัง
+                        btn.className = `counter-tab-btn p-4 rounded-2xl border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 text-center transition flex flex-col items-center justify-center gap-1 font-bold`;
                     }
                 });
             };
@@ -357,10 +358,12 @@
 
                 const waiting = queues.filter(q => q.status === 'waiting' && q.type === config.type).sort((a,b) => a.timestamp - b.timestamp);
                 document.getElementById('staff-wait-count').innerText = waiting.length;
+                
+                // แก้จุดสีฟอนต์จางในลิสต์รอ: ปรับตัวเลขคิวเป็นสีชมพู/เทาเข้มตัวใหญ่ชัดเจนที่สุด
                 document.getElementById('staff-wait-list').innerHTML = waiting.map(q => 
-                    `<li class="flex justify-between items-center p-3 bg-white border-2 border-gray-100 rounded-xl animate-fade-in shadow-sm">
-                        <span class="text-2xl font-black text-sky-500"><i class="fa-solid fa-ticket text-amber-400 mr-2 text-lg"></i> ${q.number}</span>
-                        <span class="text-gray-400 text-base font-bold">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
+                    `<li class="flex justify-between items-center p-3.5 bg-white border-2 border-slate-200 rounded-xl animate-fade-in shadow-sm">
+                        <span class="text-3xl font-black text-pink-600"><i class="fa-solid fa-ticket text-amber-500 mr-2 text-xl"></i> ${q.number}</span>
+                        <span class="text-slate-700 text-lg font-black">${new Date(q.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})} น.</span>
                      </li>`
                 ).join('');
             };
@@ -387,7 +390,7 @@
         };
 
         // ==========================================
-        // 4. TV DISPLAY MODE (หน้าจอใหญ่เปิดบนทีวีรวม - บอร์ดสีสว่างสดใส ตัวใหญ่ยักษ์)
+        // 4. TV DISPLAY MODE 
         // ==========================================
         const renderTV = (container) => {
             let lastAnnounce = "";
@@ -437,9 +440,8 @@
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'th-TH';
-                utterance.rate = 0.85; // เสียงประกาศน่ารัก ไม่เร็วเกินไป
+                utterance.rate = 0.85; 
                 const voices = window.speechSynthesis.getVoices();
-                // เลือกใช้เสียงผู้หญิงภาษาไทยเพื่อความนุ่มนวลเป็นมิตรกับเด็ก
                 const femaleVoice = voices.find(v => v.lang.includes('th') && (v.name.includes('Female') || v.name.includes('Kanya') || v.name.includes('Narisa')));
                 if (femaleVoice) utterance.voice = femaleVoice;
                 window.speechSynthesis.speak(utterance);
@@ -462,7 +464,6 @@
                     }
                 }
                 
-                // ออกแบบการ์ดคิวที่จอทีวี: พื้นหลังสว่าง สะอาด คิวตัวใหญ่สะใจ การระบุช่องเน้นป้ายสีสันสดใสพาสเทล
                 document.getElementById('tv-serving-list').innerHTML = serving.map((q, idx) => {
                     const isNew = idx === 0; 
                     return `
