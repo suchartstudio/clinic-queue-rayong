@@ -1,14 +1,13 @@
-const CACHE_NAME = 'smart-queue-v1';
+const CACHE_NAME = 'smart-queue-rayong-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://html2canvas.hertzen.com/dist/html2canvas.min.js'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// ติดตั้งและเก็บแคชไฟล์ที่จำเป็น
+// ติดตั้งและเก็บแคชไฟล์ภายในโฮสต์ตนเอง
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -18,7 +17,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// เปิดใช้งานและลบแคชเก่า (ถ้ามี)
+// เปิดใช้งานและเคลียร์แคชเก่า
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -34,7 +33,7 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// ดึงข้อมูลจากแคชเพื่อความรวดเร็ว ถ้าไม่มีค่อยโหลดจากเน็ต
+// ตรวจสอบและดึงข้อมูล (ถ้าเป็นลิงก์นอก ไม่ต้องบังคับดึงลงแคชตรงๆ เพื่อเลี่ยง CORS)
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
