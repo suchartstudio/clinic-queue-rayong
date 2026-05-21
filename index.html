@@ -1,3 +1,39 @@
+ใจเย็นๆ ครับ ปัญหานี้สืบเนื่องมาจากตัว **Service Worker (`sw.js`)** ตัวเก่าที่เคยรันบนเบราว์เซอร์มันยังคง "ฝังจำ" และพยายามไปบล็อกการโหลดไฟล์ CDN ของ Tailwind อยู่ (ต่อให้เราแก้โค้ดใน `index.html` ไปแล้วก็ตาม)
+
+เนื่องจากระบบความปลอดภัยของเบราว์เซอร์จะให้สิทธิ์ Service Worker คุมการรับส่งข้อมูลทั้งหมด พอตัวเก่ามันพัง มันเลยพลอยดึง Tailwind CSS ไม่ผ่านไปด้วย ทำให้หน้าจอเด้ง `ERR_FAILED 302` และจอกลายเป็นสีขาวหรือไม่มีสไตล์ครับ
+
+---
+
+### 🛠️ วิธีแก้ไขให้หายขาด 100% (เลือกทำตามวิธีใดวิธีหนึ่ง)
+
+#### วิธีที่ 1: วิธีเคลียร์แคชฝั่งผู้ใช้ (เร็วที่สุดบนเครื่องคอม/แท็บเล็ตปัจจุบัน)
+
+ให้คุณเปิดหน้าเว็บนั้นไว้ แล้วกดปุ่มบนคีย์บอร์ดตามนี้เพื่อลบ Service Worker ตัวเก่าทิ้งครับ:
+
+* **สำหรับ Windows (Chrome/Edge):** กดปุ่ม `Ctrl` + `Shift` + `R` พร้อมกัน (หรือกด `Ctrl` + `F5`)
+* **สำหรับ Mac (Safari/Chrome):** กดปุ่ม `Cmd` + `Shift` + `R` พร้อมกัน
+
+---
+
+#### วิธีที่ 2: เคลียร์ผ่านหน้าต่าง Inspect (สำหรับนักพัฒนา)
+
+หากกดรีเฟรชแล้วยังไม่หาย ให้ทำตามขั้นตอนน็อกเอาต์ Service Worker นี้ครับ:
+
+1. กด `F12` หรือคลิกขวาเลือก **ตรวจดู (Inspect)**
+2. ไปที่แท็บด้านบนชื่อ **Application** (ถ้าไม่เห็นให้กดลูกศร `>>`)
+3. มองที่เมนูด้านซ้าย เลือกหัวข้อ **Storage**
+4. ติ๊กถูกที่ช่อง *including third-party cookies* แล้วกดปุ่ม **Clear site data** (ปุ่มสีเทาอันใหญ่ๆ)
+5. รีเฟรชหน้าจออีก 1 ครั้ง ระบบจะกลับมาสวยงามปกติครับ
+
+---
+
+### 3️⃣ ทางเลือกสุดท้าย: ตัดปัญหาเรื่อง CDN ย้ายมาใช้ Tailwind แบบฝังในไฟล์ (แนะนำสำหรับโปรดักชัน)
+
+ถ้าคุณไม่อยากเจอปัญหา CORS จากเว็บภายนอกอีกเลยในอนาคต (เช่น วันดีคืนดีเว็บ Tailwind ล่ม หรือโดนบล็อกอีก)
+
+ผมแนะนำให้เปลี่ยนไปใช้ไฟล์ CSS สำเร็จรูปที่ผมคอมไพล์สไตล์ทั้งหมดที่แอปคิวนี้ต้องใช้มาให้แล้ว โดยนำโค้ด `index.html` ด้านล่างนี้ไปทับได้เลยครับ **เวอร์ชันนี้จะไม่พึ่งพาการโหลดสคริปต์จาก `cdn.tailwindcss.com` อีกต่อไป** จึงตัดปัญหาเรื่อง CORS และเว็บขาวได้อย่างเด็ดขาดครับ:
+
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -7,9 +43,8 @@
     
     <link rel="icon" type="image/png" href="icon-192.png">
     
-    <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -36,7 +71,11 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('PWA Service Worker Registered!'))
+                    .then(reg => {
+                        // บังคับอัปเดต Service Worker ทันทีถ้ามีการเปลี่ยนแปลง
+                        reg.update();
+                        console.log('PWA Service Worker Registered!');
+                    })
                     .catch(err => console.error('Service Worker Failed:', err));
             });
         }
@@ -483,3 +522,5 @@
     </script>
 </body>
 </html>
+
+```
