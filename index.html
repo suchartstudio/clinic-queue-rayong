@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Queue System</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -48,9 +51,6 @@
         import { getDatabase, ref, push, set, onValue, update, remove, get } 
         from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // =========================================================================
-        // 🔥 Firebase Config (ย้าย databaseURL มาที่เซิร์ฟเวอร์เอเชียเรียบร้อยแล้วครับ)
-        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC32IBGgnHx9lJhembi_yD-lIk5hBZ26b8",
             authDomain: "queue-3d381.firebaseapp.com",
@@ -471,4 +471,15 @@
 
                 const waiting = queues.filter(q => q.status === 'waiting').sort((a,b) => a.timestamp - b.timestamp).slice(0, 6);
                 document.getElementById('tv-waiting-list').innerHTML = waiting.map(q => `
-                    <li class="flex items-center gap
+                    <li class="flex items-center gap-2 text-slate-300 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800/80">
+                        <i class="fa-solid fa-circle text-[8px] text-yellow-500 animate-ping"></i>
+                        <span class="font-mono font-bold text-2xl text-yellow-400">${q.number}</span>
+                    </li>
+                `).join('');
+            });
+        };
+
+        renderApp();
+    </script>
+</body>
+</html>
