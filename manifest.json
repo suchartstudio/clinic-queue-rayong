@@ -1,0 +1,39 @@
+{
+  "name": "Smart Queue System",
+  "short_name": "SmartQueue",
+  "description": "ระบบจัดการคิวอัจฉริยะแยกช่องบริการ",
+  "start_url": "./index.html?mode=kiosk",
+  "display": "standalone",
+  "background_color": "#1e40af",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ตู้กดคิว (Kiosk)",
+      "url": "./index.html?mode=kiosk",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "หน้าจอทีวี (TV Display)",
+      "url": "./index.html?mode=tv",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "ระบบพนักงาน (Staff)",
+      "url": "./index.html?mode=staff",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
